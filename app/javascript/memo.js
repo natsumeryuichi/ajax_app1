@@ -1,3 +1,21 @@
+const buildHTML = (XHR) => {
+  const item = XHR.response.post;
+  const html = `
+    <div class="post">
+      <div class="post-date">
+        投稿日時：${item.created_at}
+      </div>
+      <div class="post-content">
+        ${item.content}
+      </div>
+    </div>`;
+// XHR.response.postと記述することで、レスポンスの中から投稿されたメモの情報を抽出し、変数itemに格納しています。
+// XHR.response.postで値が取れるのは、postsコントローラーのcreateアクションにrender json: {post: post}と記述されていることで、postというキーと投稿されたメモの内容が紐付いているからです。
+
+  return html;
+};
+
+
 function post(){
   const submit = document.getElementById("submit");
   submit.addEventListener("click", (e) => {
@@ -17,6 +35,21 @@ function post(){
 // リクエストを送信する際に、レスポンスで欲しいデータフォーマットをあらかじめ指定しておく必要があります。
 // 今回は、レスポンスのデータを「JSON形式」で返して欲しいため、データフォーマットを「JSON」に指定します。
     XHR.send(formData);
+    XHR.onload = () => {
+      if (XHR.status != 200) {
+        alert(`Error ${XHR.status}: ${XHR.statusText}`);
+        return null;
+      };
+      const list = document.getElementById("list");
+      const formText = document.getElementById("content");
+      list.insertAdjacentHTML("afterend", buildHTML(XHR));
+// insertAdjacentHTMLメソッドとは、HTMLをある要素の指定した箇所に挿入するメソッドです。
+// HTMLを挿入したい要素に対して使うメソッドで、第一引数にHTMLを挿入したい位置、第二引数に挿入したいHTMLを記述します。
+      formText.value = "";
+    };
+// onloadプロパティとは、リクエストの送信が成功したときに呼び出されるプロパティのことです。
+// XMLHttpRequestオブジェクトのプロパティの一種です。
+// onloadプロパティで、リクエストの送信に成功したときに行う処理を定義します。
   });
 };
 
